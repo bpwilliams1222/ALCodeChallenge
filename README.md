@@ -1,0 +1,2 @@
+# ALCodeChallenge
+This is an application that pulls in data leveraging Stackoverflow's API. It pulls in questions with accepted answers where there are more than one answer option. This data will be provided to users through an interactive game-like experience where they can choose from a list of answers to a question in attempts to choose correctly versus what was accepted within Stackoverflow. Good luck!
