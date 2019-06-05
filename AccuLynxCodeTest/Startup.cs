@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AccuLynxCodeTest.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,8 @@ namespace AccuLynxCodeTest
 {
     public class Startup
     {
+        public static StorageModel DataStorageService = new StorageModel();
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

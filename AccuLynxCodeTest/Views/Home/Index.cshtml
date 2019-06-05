@@ -2,3 +2,113 @@
 }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.8/angular.min.js"></script>
+<script src="~/js/app.js"></script>
+<script>
+    function search() {
+        var elements = $('.questionScoreContainer');
+        for (var i = 0; i < elements.length; i++) {
+            console.log($($($(elements[i]).children()[0]).children()[2]).children()[0]);
+            console.log($($($($(elements[i]).children()[0]).children()[2]).children()[0]).text());
+            if ($($($($(elements[i]).children()[0]).children()[2]).children()[0]).text() == $("#search").val() ||
+                ($($($($(elements[i]).children()[0]).children()[2]).children()[0]).text()).includes($("#search").val()) ||
+                ($($($($(elements[i]).children()[0]).children()[2]).children()[0]).text()).toLowerCase().includes($("#search").val().toLowerCase())) {
+                $(elements[i]).removeClass('hidden');
+            } else {
+                $(elements[i]).addClass('hidden');
+            }            
+        }
+    }
+    function openInTab(url) {
+        var winOpened = window.open(url, '_blank');
+        if (winOpened) {
+            winOpened.focus();
+        }
+    }
+    function expandCollapse(div) {
+        if ($($(div).children()[2]).hasClass('hidden')) {
+            $($(div).children()[2]).removeClass('hidden');
+            $($(div).prev()).text("-");
+        } else {
+            $($(div).children()[2]).addClass('hidden');
+            $($(div).prev()).text("+");
+        }        
+    }
+    function changeSelectedAnswer(selectedAnswerDiv) {
+        if (!$(selectedAnswerDiv).hasClass('locked')) {
+            if ($($(selectedAnswerDiv).parent()).children().hasClass('questionAnswerPossibility-selected')) {
+                var childrenElements = $($(selectedAnswerDiv).parent()).children();
+                for (var i = 0; i < childrenElements.length; i++) {
+                    if ($(childrenElements[i]).hasClass('questionAnswerPossibility-selected')) {
+                        $(childrenElements[i]).toggleClass('questionAnswerPossibility');
+                        $(childrenElements[i]).toggleClass('questionAnswerPossibility-selected');
+                    }
+                }
+            }
+            $(selectedAnswerDiv).toggleClass('questionAnswerPossibility');
+            $(selectedAnswerDiv).toggleClass('questionAnswerPossibility-selected');
+        }
+    }
+</script>
+<body ng-app="app" style="margin-top:15px;">
+    <div class="col-sm-12" ng-controller="GameSession">
+        <div id="start_session_btn" class="col-sm-offset-5 col-sm-7"><button ng-click="StartGameSessionSettings()" class="btn btn-lg">Start Game</button></div>
+        <div class="hidden col-sm-offset-4 col-sm-8" id="start_game_session">
+            <div class="form-group">
+                <label class="control-label" for="username">Username</label>
+                <input type="text" id="username" />
+            </div>
+            <div class="form-group" style="padding-left:15%;">
+                <button ng-click="StartGameSession()" class="btn-lg">Start Game</button>
+            </div>
+        </div>
+        <div class="hidden col-sm-12" id="game_session">
+            <div class="col-sm-offset-3 col-sm-9" style="margin-bottom:20px;">
+                <div class="form-group">
+                    <label class="control-label" for="search">Search</label>
+                    <input onkeyup="search()" type="text" class="form-control" id="search" style="max-width:300px" />
+                </div>
+            </div>
+            <div class="questionScoreContainer col-sm-12">
+                <div class="col-sm-12 scoreContainer">
+                    <div class="col-sm-offset-5 col-sm-7 h3"></div>
+                    <div class="col-sm-12 h1 toggle" onclick="expandCollapse($(this).next())">-</div>
+                    <div class="col-sm-12 questionContainer">
+                        <div class="col-sm-offset-1 col-sm-11 questionTitle h4" onclick="openInTab('https://www.google.com')">Question TitleA</div>
+                        <div class="col-sm-12 questionBodyContainer h6"><div class="col-sm-offset-1 col-sm-11 questionBody h6">Question Body</div></div>
+                        <div class="col-sm-12 hidden questionAnswersContainer h6">
+                            <div id="123456" class="col-sm-offset-1 col-sm-11 questionAnswerPossibility h6" onclick="changeSelectedAnswer($(this))">Question Answer 1</div>
+                            <div class="col-sm-12" style="top:-10px;"><hr /></div>
+                            <div id="23456" class="col-sm-offset-1 col-sm-11 questionAnswerPossibility h6" onclick="changeSelectedAnswer($(this))">Question Answer 2</div>
+                        </div>
+                    </div>
+                    <div ng-click="scoreQuestion($event)" class="col-sm-offset-5 col-sm-7"><button class="btn">Submit Selection</button></div>
+                </div>
+                <input type="hidden" id="123456" class="acceptedAnswerId" />
+                <input type="hidden" id="987654" class="questionId" />
+            </div>
+            <div class="questionScoreContainer col-sm-12">
+                <div class="col-sm-12 scoreContainer">
+                    <div class="col-sm-offset-5 col-sm-7 h3"></div>
+                    <div class="col-sm-12 h1 toggle" onclick="expandCollapse($(this).next())">-</div>
+                    <div class="col-sm-12 questionContainer">
+                        <div class="col-sm-offset-1 col-sm-11 questionTitle h4" onclick="openInTab('https://www.google.com')">Question TitleB</div>
+                        <div class="col-sm-12 questionBodyContainer h6"><div class="col-sm-offset-1 col-sm-11 questionBody h6">Question Body</div></div>
+                        <div class="col-sm-12 hidden questionAnswers h6">
+                            <div id="123456" class="col-sm-offset-1 col-sm-11 questionAnswerPossibility h6" onclick="changeSelectedAnswer($(this))">Question Answer 1</div>
+                            <div class="col-sm-12" style="top:-10px;"><hr /></div>
+                            <div id="23456" class="col-sm-offset-1 col-sm-11 questionAnswerPossibility h6" onclick="changeSelectedAnswer($(this))">Question Answer 2</div>
+                        </div>
+                    </div>
+                    <div ng-click="scoreQuestion($event)" class="col-sm-offset-5 col-sm-7"><button class="btn">Submit Selection</button></div>
+                </div>
+                <input type="hidden" id="123456" class="acceptedAnswerId" />
+                <input type="hidden" id="987654" class="questionId" />
+            </div>
+        </div>
+        <div id="finishSessionContainer" class="col-sm-12 hidden">
+            <div class="col-sm-offset-5 col-sm-7">
+                <button class="btn-lg" ng-click="finishSession()">Finish Session</button>
+            </div>
+        </div>
+    </div>
+</body>

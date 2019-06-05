@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,8 +7,8 @@ namespace AccuLynxCodeTest.Models
 {
     public class AnswerModel
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Key]
+        [System.ComponentModel.DataAnnotations.Schema.DatabaseGenerated(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None)]
+        [System.ComponentModel.DataAnnotations.Key]
         public int answer_id { get; set; }
         public int question_id { get; set; }
         public int creation_date { get; set; }

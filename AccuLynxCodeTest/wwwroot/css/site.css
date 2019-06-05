@@ -1,37 +1,54 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\ 
-for details on configuring this project to bundle and minify static web assets. */
-body {
+﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
 }
 
-/* Wrapping element */
-/* Set some basic padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
 }
 
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
+.questionContainer{
+    border:1px solid black;
 }
 
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"] {
-    width: 100%;
+.questionScoreContainer {
+    border: 1px solid black;
 }
 
-/* QR code generator */
-#qrCode {
-    margin: 15px;
+.questionBodyContainer{
+    border:1px solid black;
+}
+.questionAnswersContainer {
+    border: 1px solid black;
+}
+hr{
+    margin-bottom:0px;
 }
 
-/* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-    /* Hide captions */
-    .carousel-caption {
-        display: none;
-    }
+.correct{
+    color:green;
+}
+.incorrect{
+    color:darkred;
+}
+.toggle{
+    top:40px;
+    left:9px;
+    margin-top:-30px;
+    margin-bottom:0px;
+    z-index:1;
+}
+.questionAnswerPossibility{
+    z-index:1;
+    border:none;
+}
+.questionAnswerPossibility-selected {
+    border: 1px solid orange;
+}
+.questionAnswerPossibility-selected-correct {
+    border: 1px solid green;
+}
+.questionAnswerPossibility-selected-incorrect {
+    border: 1px solid red;
 }

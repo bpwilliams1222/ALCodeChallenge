@@ -27,7 +27,7 @@ namespace AccuLynxCodeTest.Models
         private int FromDate = 1464912000;
         private int ToDate = 1465084740;
         private int runFlag = 0;
-
+        private List<UserModel> Users = new List<UserModel>();
 
         public StorageModel()
         {
@@ -40,14 +40,20 @@ namespace AccuLynxCodeTest.Models
                     ToDate = FromDate + 172740;
                 }
             }
-            //Instatiate a BackgroundWord, and run the worker only when the process has been checked by a timer interval to ensure it is not currently running. This will avoid duplicate records 
-            //and ensure we only run one process at a time incrementing the fromdate and todate after each successful api pull and db update
+            /*Instatiate a BackgroundWord, and run the worker only when the process has been checked by a timer interval to ensure it is not currently running. This will avoid duplicate records 
+            and ensure we only run one process at a time incrementing the fromdate and todate after each successful api pull and db update*/
             using (DataUpdateService = new BackgroundWorker())
             {
                 DataUpdateService.DoWork += FetchData;
                 DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, 1, 0).TotalMilliseconds);
                 DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
                 DataUpdateServiceTimer.Start();
+            }
+            //Initialize Users from DB's list of Users     
+            using (var usersDb = new UsersDb())
+            {
+                if(usersDb.Users.Count() > 0)
+                    Users = usersDb.Users.ToList();
             }
         }
 
@@ -135,6 +141,35 @@ namespace AccuLynxCodeTest.Models
                     }
                 }
             }
+        }
+        
+        public async void AddUser(UserModel user)
+        {
+            //create user object to add to list of users and save updates to db            
+            Users.Add(user);
+            using (var usersDb = new UsersDb())
+            {
+                usersDb.Users.Add(user);
+                await usersDb.SaveChangesAsync();
+            }
+        }
+
+        public async void UpdateUser(UserModel user)
+        {
+            using (var usersDb = new UsersDb())
+            {
+                var oldDbUserData = await usersDb.Users.FirstOrDefaultAsync(c => c.username == user.username);
+                oldDbUserData.correctAnswers += user.correctAnswers;
+                oldDbUserData.incorrectAnswers += user.incorrectAnswers;
+                await usersDb.SaveChangesAsync();
+                var oldModelUserData = Users.FirstOrDefault(c => c.username == user.username);
+                oldModelUserData = oldDbUserData;
+            }
+        }
+
+        public List<UserModel> GetUsers()
+        {
+            return Users;
         }
     }
 }
