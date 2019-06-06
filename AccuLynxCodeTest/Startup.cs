@@ -15,8 +15,6 @@ namespace AccuLynxCodeTest
 {
     public class Startup
     {
-        public static StorageModel DataStorageService = new StorageModel();
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

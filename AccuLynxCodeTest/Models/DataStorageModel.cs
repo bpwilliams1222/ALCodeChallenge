@@ -24,10 +24,9 @@ namespace AccuLynxCodeTest.Models
     {
         private BackgroundWorker DataUpdateService;
         private Timer DataUpdateServiceTimer;
-        private int FromDate = 1464912000;
-        private int ToDate = 1465084740;
+        private int FromDate = 1551835052;
+        private int ToDate = 1552007792;
         private int runFlag = 0;
-        private List<UserModel> Users = new List<UserModel>();
 
         public StorageModel()
         {
@@ -48,13 +47,7 @@ namespace AccuLynxCodeTest.Models
                 DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, 1, 0).TotalMilliseconds);
                 DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
                 DataUpdateServiceTimer.Start();
-            }
-            //Initialize Users from DB's list of Users     
-            using (var usersDb = new UsersDb())
-            {
-                if(usersDb.Users.Count() > 0)
-                    Users = usersDb.Users.ToList();
-            }
+            }           
         }
 
         // checks Background process to determine if it is running, if not executes ReceiveNews method
@@ -80,73 +73,82 @@ namespace AccuLynxCodeTest.Models
 
         private async void FetchData(object sender, DoWorkEventArgs e)
         {
-            //HttpClientHandler is needed to configure the HttpClient to utlize GZip
-            HttpClientHandler handler = new HttpClientHandler()
+            try
             {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
-            using (HttpClient client = new HttpClient(handler))
-            {
-                //Get response from API
-                using (HttpResponseMessage response = await client.GetAsync("https://api.stackexchange.com/2.2/questions?filter=!6h_6LPB9mi4f3VS50f9bHUwlhXNhd(idEXcx.qsqzpIjX9&order=desc&sort=activity&site=stackoverflow&pagesize=100&fromdate=" + FromDate + "&todate=" + ToDate))
+                //HttpClientHandler is needed to configure the HttpClient to utlize GZip
+                HttpClientHandler handler = new HttpClientHandler()
                 {
-                    using (HttpContent content = response.Content)
+                    AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+                };
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    //Get response from API
+                    using (HttpResponseMessage response = await client.GetAsync("https://api.stackexchange.com/2.2/questions?filter=!6h_6LPB9mi4f3VS50f9bHUwlhXNhd(idEXcx.qsqzpIjX9&order=desc&sort=activity&site=stackoverflow&pagesize=100&fromdate=" + FromDate + "&todate=" + ToDate))
                     {
-                        //Read content as a string, easiest for parsing the json string into an explicit model
-                        var result = await content.ReadAsStringAsync();
-                        DataModel jsonObj = JsonConvert.DeserializeObject<DataModel>(result);
-                        List<QuestionModel> Questions = JsonConvert.DeserializeObject<List<QuestionModel>>(jsonObj.items.ToString());
-                        //initialize db, prepare for update
-                        using (var questionsDb = new QuestionsDb())
+                        using (HttpContent content = response.Content)
                         {
-                            //If less than 100 records received throttle back the timer that controls the interval between api calls
-                            if(Questions.Count < 100)
+                            //Read content as a string, easiest for parsing the json string into an explicit model
+                            var result = await content.ReadAsStringAsync();
+                            DataModel jsonObj = JsonConvert.DeserializeObject<DataModel>(result);
+                            List<QuestionModel> Questions = JsonConvert.DeserializeObject<List<QuestionModel>>(jsonObj.items.ToString());
+                            //initialize db, prepare for update
+                            using (var questionsDb = new QuestionsDb())
                             {
-                                DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(1, 0, 0).TotalMilliseconds);
-                                DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
-                                DataUpdateServiceTimer.Start();
-                                runFlag = 60;
-                            }
-                            //No need to take action if there are not any questions
-                            if (Questions.Count > 0)
-                            {
-                                //Only interested in questions that have 2 answers or more and one of them have been accepted
-                                await questionsDb.AddRangeAsync(Questions.Where(c => c.answer_count >= 2 && c.accepted_answer_id > 0));
-                                var dbSaveResult = await questionsDb.SaveChangesAsync();
-                                //No need to increment the flag variable if the data fetched was not successfully updated to the db
-                                if (dbSaveResult >= 1)
+                                //If less than 100 records received throttle back the timer that controls the interval between api calls
+                                if (Questions.Count < 100)
                                 {
-                                    /*Increment these flag parameters for use in the next api call, this will make sure we don't accidentally call for 
-                                    the same data and attempt to add a duplicate record into the db*/
-                                    FromDate = questionsDb.Questions.OrderByDescending(c => c.creation_date).First().creation_date + 1;
-                                    ToDate = FromDate + 172740;
+                                    DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(1, 0, 0).TotalMilliseconds);
+                                    DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
+                                    DataUpdateServiceTimer.Start();
+                                    runFlag = 60;
+                                }
+                                //No need to take action if there are not any questions
+                                if (Questions.Count > 0)
+                                {
+                                    //Only interested in questions that have 2 answers or more and one of them have been accepted
+                                    await questionsDb.AddRangeAsync(Questions.Where(c => c.answer_count >= 2 && c.accepted_answer_id > 0));
+                                    var dbSaveResult = await questionsDb.SaveChangesAsync();
+                                    //No need to increment the flag variable if the data fetched was not successfully updated to the db
+                                    if (dbSaveResult >= 1)
+                                    {
+                                        /*Increment these flag parameters for use in the next api call, this will make sure we don't accidentally call for 
+                                        the same data and attempt to add a duplicate record into the db*/
+                                        FromDate = questionsDb.Questions.OrderByDescending(c => c.creation_date).First().creation_date + 1;
+                                        ToDate = FromDate + 172740;
+                                    }
                                 }
                             }
-                        }
-                        using (var answersDb = new AnswersDb())
-                        {
-                            /*Iterate over each question and parse json string into a answer model and save to db, again only interested in 
-                            questions with more than 2 answers where one has been accepted*/
-                            foreach (QuestionModel question in Questions.Where(c => c.answer_count >= 2))
+                            using (var answersDb = new AnswersDb())
                             {
-                                await answersDb.Answers.AddRangeAsync(question.answers);
+                                /*Iterate over each question and parse json string into a answer model and save to db, again only interested in 
+                                questions with more than 2 answers where one has been accepted*/
+                                foreach (QuestionModel question in Questions.Where(c => c.answer_count >= 2 && c.accepted_answer_id > 0))
+                                {
+                                    await answersDb.Answers.AddRangeAsync(question.answers);
+                                }
+                                await answersDb.SaveChangesAsync();
                             }
-                            await answersDb.SaveChangesAsync();
-                        }
-                        //Clear variable and release resources to GC
-                        if (Questions != null)
-                        {
-                            Questions.Clear();
+                            //Clear variable and release resources to GC
+                            if (Questions != null)
+                            {
+                                Questions.Clear();
+                            }
                         }
                     }
+                }
+            } catch(Microsoft.EntityFrameworkCore.DbUpdateException error)
+            {
+                using (var questionsDb = new QuestionsDb())
+                {
+                    FromDate = questionsDb.Questions.OrderByDescending(c => c.creation_date).First().creation_date + 1;
+                    ToDate = FromDate + 172740;
                 }
             }
         }
         
         public async void AddUser(UserModel user)
         {
-            //create user object to add to list of users and save updates to db            
-            Users.Add(user);
+            //save user object to db
             using (var usersDb = new UsersDb())
             {
                 usersDb.Users.Add(user);
@@ -156,20 +158,14 @@ namespace AccuLynxCodeTest.Models
 
         public async void UpdateUser(UserModel user)
         {
+            //Find old user data, and update it with the incoming data model, then save changes to db
             using (var usersDb = new UsersDb())
             {
                 var oldDbUserData = await usersDb.Users.FirstOrDefaultAsync(c => c.username == user.username);
                 oldDbUserData.correctAnswers += user.correctAnswers;
                 oldDbUserData.incorrectAnswers += user.incorrectAnswers;
                 await usersDb.SaveChangesAsync();
-                var oldModelUserData = Users.FirstOrDefault(c => c.username == user.username);
-                oldModelUserData = oldDbUserData;
             }
-        }
-
-        public List<UserModel> GetUsers()
-        {
-            return Users;
         }
     }
 }

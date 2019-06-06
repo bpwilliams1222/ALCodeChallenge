@@ -1,0 +1,35 @@
+﻿@model IEnumerable<AccuLynxCodeTest.Models.UserModel>
+
+@{
+    ViewData["Title"] = "Scores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Scores</h2>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.username)</th>
+            <th>
+                @Html.DisplayNameFor(model => model.correctAnswers)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.incorrectAnswers)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.username)</td>
+            <td>
+                @Html.DisplayFor(modelItem => item.correctAnswers)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.incorrectAnswers)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
