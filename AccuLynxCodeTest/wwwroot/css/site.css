@@ -59,3 +59,7 @@ hr{
     cursor: pointer;
     color: #0000EE;
 }
+
+hr{
+    border-color:black;
+}

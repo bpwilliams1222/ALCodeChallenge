@@ -15,7 +15,7 @@ namespace AccuLynxCodeTest
 {
     public class Startup
     {
-        public const string DBConnectionString = "Data Source=alcodetest.c658lafxcxw1.us-east-2.rds.amazonaws.com;Initial Catalog=GameData;Persist Security Info=True;User ID=madnudist;Password=th3lynxarmy";//@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ALCodeChallenge;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        public const string DBConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ALCodeChallenge;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         public Startup(IConfiguration configuration)
         {
