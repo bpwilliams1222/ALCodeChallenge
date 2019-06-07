@@ -20,6 +20,11 @@ namespace AccuLynxCodeTest.Controllers
     {
         private StorageModel DataStorageService = new StorageModel();
 
+        public IActionResult Quiz()
+        {
+            return View();
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -65,40 +70,75 @@ namespace AccuLynxCodeTest.Controllers
         [HttpPost]
         public IActionResult GetGameData([FromBody]List<QuestionModel> Questions)
         {
+            var data = new List<QuestionModel>();
             //Null object can be received on initial application load
-            if(Questions == null)
+            if (Questions == null)
             {
                 Questions = new List<QuestionModel>();
+                try
+                {
+                    using (var questionDb = new QuestionsDb())
+                    {
+                        data = questionDb.Questions.OrderByDescending(c => c.creation_date).Take(25).ToList();
+                    }
+                }
+                catch { }
             }
+            else
+            {
+                //Determine last question on the DOM, order did change when object was passed from the angular controller
+                var lastQuestionCreated = Questions.LastOrDefault();
+                int lastCreationDate = 0;
+                if (lastQuestionCreated != null)
+                {
+                    lastCreationDate = lastQuestionCreated.creation_date;
+                    try
+                    {
+                        //Get 25 more questions that are older than the last question from the array
+                        using (var questionDb = new QuestionsDb())
+                        {
+                            data = questionDb.Questions.Where(c => c.creation_date < lastCreationDate).OrderByDescending(c => c.creation_date).Take(25).ToList();
+                        }
+                    }
+                    catch { }
+                }
+            }
+
+            try
+            {
+                //Get coorisponding answers to questions grabbed to be returned
+                using (var answersDb = new AnswersDb())
+                {
+                    foreach (var question in data)
+                    {
+                        question.answers = answersDb.Answers.Where(c => c.question_id == question.question_id).OrderBy(c => Guid.NewGuid()).ToList();
+                    }
+                }
+            }
+            catch { }
+            //Add data to Questions received from the angular controller in preparation of returning the entire list
+            Questions.AddRange(data);
+            return Json(Questions);
+        }
+
+        [HttpPost]
+        public IActionResult GetRandomGameData()
+        {
             var data = new List<QuestionModel>();
             try
             {
+                //Get 10 random questions from DB
                 using (var questionDb = new QuestionsDb())
                 {
-                    data = questionDb.Questions.OrderBy(c => Guid.NewGuid()).Take(10).ToList();
-                    //Check for duplicates based on an incoming array of questions
-                    while (data.Except(Questions).Count() < 10)
+                    data = questionDb.Questions.OrderByDescending(c => Guid.NewGuid()).Take(10).ToList();
+                }
+                // Get coorisponding answers to questions grabbed to be returned
+                using (var answersDb = new AnswersDb())
+                {
+                    foreach (var question in data)
                     {
-                        //Determine how many duplicates there are and remove them from the data to be returned
-                        IEnumerable<QuestionModel> common = data.Intersect(Questions).ToList();
-                        int flag = data.RemoveAll(c => common.Contains(c));
-                        /* Itterate as many times as there are duplicates and replace them with a random record, parent loop 
-                         * will repeat in the event a second duplicate is found
-                         */
-                        for(int i =0; i < flag; i++)
-                        {
-                            data.Add(questionDb.Questions.OrderBy(c => Guid.NewGuid()).FirstOrDefault());
-                        }
+                        question.answers = answersDb.Answers.Where(c => c.question_id == question.question_id).OrderBy(c => Guid.NewGuid()).ToList();
                     }
-                    //Get coorisponding answers to questions grabbed to be returned
-                    using (var answersDb = new AnswersDb())
-                    {
-                        foreach (var question in data)
-                        {
-                            question.answers = answersDb.Answers.Where(c => c.question_id == question.question_id).OrderBy(c => Guid.NewGuid()).ToList();
-                        }
-                    }
-
                 }
             }
             catch { }

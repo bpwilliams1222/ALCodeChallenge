@@ -1,0 +1,26 @@
+﻿@model IEnumerable<AccuLynxCodeTest.Models.QuestionModel>
+
+@{
+    ViewData["Title"] = "Index2";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Recent Stack Overflow Questions</h2>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.creation_date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.title)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr><td>@Html.DisplayFor(modelItem => item.creation_date)</td><td>@Html.DisplayFor(modelItem => item.title)</td></tr>
+}
+    </tbody>
+</table>

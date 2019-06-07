@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Game Session";
+    ViewData["Title"] = "Stack Overflow Questionnaire";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script src="~/js/gameUI.js"></script>
@@ -7,34 +7,61 @@
 <script src="~/js/app.js"></script>
 <body ng-app="app" style="margin-top:15px;">
     <div class="col-sm-12" ng-controller="GameSession">
-        <div class="col-sm-12">
+        <div class="col-sm-12 descriptionContainer">
             <div class="col-sm-offset-3 col-sm-6 h5">
-                Do you think you have what it takes? Put your web dev knowledge up to the test of 10 
-                random Stack Overflow Questions. Simply click the Start button below to get started!
+                Do you think you have what it takes? Put your web dev knowledge up to the test, use the button
+                below to get started with knocking some questions out.
             </div>
             <div class="col-sm-3"></div>
         </div>
-        <div id="start_session_btn" class="col-sm-offset-5 col-sm-7"><button ng-click="StartGameSessionSettings()" class="btn btn-lg">Start Game</button></div>
-        <div class="hidden col-sm-offset-4 col-sm-8" id="start_game_session">
+        <div class="col-sm-offset-5 col-sm-7 getStartedBtnContainer"><button ng-click="StartGameSessionSettings()" class="btn btn-lg">Let's Get Started!</button></div>
+        <div class="hidden col-sm-offset-4 col-sm-8 gameSettingsContainer">
             <div class="form-group">
                 <label class="control-label" for="username">Username</label>
                 <input onkeyup="validateName()" type="text" id="username" />
             </div>
             <div class="form-group" style="padding-left:15%;">
-                <button id="startGameBtn" disabled ng-click="StartGameSession()" class="btn-lg">Start Game</button>
+                <button disabled ng-click="StartGameSession()" class="btn-lg startGameBtn">Start Game</button>
             </div>
         </div>
-        <div class="hidden col-sm-12" id="game_session">
-            <div class="col-sm-offset-3 col-sm-9" style="margin-bottom:20px;">
-                <div class="form-group">
-                    <label class="control-label" for="search">Search</label>
-                    <input onkeyup="search()" type="text" class="form-control" id="search" style="max-width:300px" />
-                </div>
+        <div class="col-sm-offset-3 col-sm-9 tableSearch hidden" style="margin-bottom:20px;">
+            <div class="form-group">
+                <label class="control-label" for="search">Search</label>
+                <input onkeyup="searchTable()" type="text" class="form-control" id="search" style="max-width:300px" />
             </div>
-        </div> 
-        <div id="finishSessionContainer" class="col-sm-12 hidden">
+        </div>
+        <div class="col-sm-12 hidden questionsTableContainer">
+
             <div class="col-sm-offset-5 col-sm-7">
-                <button class="btn-lg" ng-click="finishSession()">Finish Session</button>
+                <button ng-click="loadMoreQuestions()" class="btn">Load More Questions</button>
+            </div>
+        </div>
+
+        <div class="userScoreContainer col-sm-offset-2 col-sm-10 hidden">
+            <div class="correct col-sm-offset-2 col-sm-5 h4">Correct: <div class="col-sm-12 correctUserScore"></div></div>
+            <div class="incorrect col-sm-5 h4">Incorrect: <div class="col-sm-12 incorrectUserScore"></div></div>
+        </div>
+        <div class="questionScoreContainer col-sm-12 hidden">
+            <div class="col-sm-12 scoreContainer">
+                <div class="col-sm-offset-5 col-sm-7 h3 answerIndicator"></div>
+                <div class="col-sm-12 h1 toggle" onclick="expandCollapse($(this).next())">+</div>
+                <div class="col-sm-12 questionContainer">
+                    <div class="col-sm-offset-1 col-sm-11 questionTitle h4" onclick="openInTab('https://www.google.com')">Question TitleA</div>
+                    <div class="col-sm-12 questionBodyContainer h6"><div class="col-sm-offset-1 col-sm-11 questionBody h6">Question Body</div></div>
+                    <div class="col-sm-12 hidden questionAnswersContainer h6">
+                        
+                    </div>
+                </div>
+                <div ng-click="scoreQuestion()" class="col-sm-offset-5 col-sm-7 submitBtnContainer"><button class="btn">Submit Selection</button></div>
+            </div>
+
+            <div class="col-sm-12 hidden finishSessionContainer">
+                <div class="col-sm-offset-2 col-sm-5">
+                    <button class="btn-lg goBackBtn" ng-click="goBack()">Go Back</button>
+                </div>
+                <div class="col-sm-5">
+                    <button class="btn-lg endGameBtn" disabled ng-click="finishSession()">End Game</button>
+                </div>
             </div>
         </div>
     </div>

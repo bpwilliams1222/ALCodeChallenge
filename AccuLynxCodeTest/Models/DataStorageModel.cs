@@ -44,7 +44,7 @@ namespace AccuLynxCodeTest.Models
             using (DataUpdateService = new BackgroundWorker())
             {
                 DataUpdateService.DoWork += FetchData;
-                DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, 1, 0).TotalMilliseconds);
+                DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, 5, 0).TotalMilliseconds);
                 DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
                 DataUpdateServiceTimer.Start();
             }           
@@ -60,8 +60,8 @@ namespace AccuLynxCodeTest.Models
                 if (runFlag != 60)
                 {
                     runFlag++;
-                    //Every 5 runs throttle back the api calling incrementally over time
-                    if (runFlag % 5 == 0)
+                    //Every 2 runs throttle back the api calling incrementally over time
+                    if (runFlag % 10 == 0)
                     {
                         DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, runFlag, 0).TotalMilliseconds);
                         DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
@@ -140,7 +140,7 @@ namespace AccuLynxCodeTest.Models
             {
                 using (var questionsDb = new QuestionsDb())
                 {
-                    FromDate = questionsDb.Questions.OrderByDescending(c => c.creation_date).First().creation_date + 1;
+                    FromDate = questionsDb.Questions.OrderByDescending(c => c.creation_date).First().creation_date + 100;
                     ToDate = FromDate + 172740;
                 }
             }
