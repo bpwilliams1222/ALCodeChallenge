@@ -10,7 +10,7 @@ app.controller('GameSession', function ($scope, $http, $compile) {
 
     $scope.StartGameSessionSettings = function () {
         $http({
-            url: "https://" + window.location.host + "/Home/GetRandomGameData",
+            url: "http://" + window.location.host + "/Home/GetRandomGameData",
             dataType: 'json',
             method: 'POST',
             data: JSON.stringify($scope.gameData),
@@ -87,7 +87,7 @@ app.controller('GameSession', function ($scope, $http, $compile) {
 
     $scope.finishSession = function () {
         $http({
-            url: "https://" + window.location.host + "/Home/FinishSession",
+            url: "http://" + window.location.host + "/Home/FinishSession",
             dataType: 'json',
             method: 'POST',
             data: JSON.stringify($scope.user),

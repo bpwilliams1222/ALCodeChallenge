@@ -24,8 +24,8 @@ namespace AccuLynxCodeTest.Models
     {
         private BackgroundWorker DataUpdateService;
         private Timer DataUpdateServiceTimer;
-        private int FromDate = 1551835052;
-        private int ToDate = 1552007792;
+        private int FromDate = 1556668800;
+        private int ToDate = 1556841540;
         private int runFlag = 0;
 
         public StorageModel()
@@ -63,7 +63,7 @@ namespace AccuLynxCodeTest.Models
                     //Every 2 runs throttle back the api calling incrementally over time
                     if (runFlag % 2 == 0)
                     {
-                        DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, runFlag, 0).TotalMilliseconds);
+                        DataUpdateServiceTimer.Interval = new TimeSpan(0, runFlag, 0).TotalMilliseconds;
                         DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
                         DataUpdateServiceTimer.Start();
                     }
@@ -97,7 +97,7 @@ namespace AccuLynxCodeTest.Models
                                 //If less than 100 records received throttle back the timer that controls the interval between api calls
                                 if (Questions.Count < 100)
                                 {
-                                    DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(1, 0, 0).TotalMilliseconds);
+                                    DataUpdateServiceTimer.Interval = new TimeSpan(0, runFlag, 0).TotalMilliseconds;
                                     DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
                                     DataUpdateServiceTimer.Start();
                                     runFlag = 30;
@@ -105,6 +105,15 @@ namespace AccuLynxCodeTest.Models
                                 //No need to take action if there are not any questions
                                 if (Questions.Count > 0)
                                 {
+                                    var duplicates = questionsDb.Questions.Except(Questions);
+                                    //Duplicate Found
+                                    if (duplicates.Any())
+                                    {
+                                        foreach(var question in duplicates)
+                                        {
+                                            Questions.Remove(question);
+                                        }
+                                    }
                                     //Only interested in questions that have 2 answers or more and one of them have been accepted
                                     await questionsDb.AddRangeAsync(Questions.Where(c => c.answer_count >= 2 && c.accepted_answer_id > 0));
                                     var dbSaveResult = await questionsDb.SaveChangesAsync();

@@ -15,7 +15,7 @@ app.controller('GameSession', function ($scope, $http, $compile) {
         $('.questionsTableContainer').prepend('<h2>Recent Stack Overflow Questions</h2><hr /><table id="questionsTable" class="table table-striped table-hover">' +
             '<thead><tr><th>Creation Date</th><th>Question Title</th></tr></thead><tbody></tbody></table>');
         $http({
-            url: "https://" + window.location.host + "/Home/GetGameData",
+            url: "http://" + window.location.host + "/Home/GetGameData",
             dataType: 'json',
             method: 'POST',
             data: JSON.stringify($scope.gameData),
@@ -96,7 +96,7 @@ app.controller('GameSession', function ($scope, $http, $compile) {
 
     $scope.finishSession = function () {        
         $http({
-            url: "https://" + window.location.host + "/Home/FinishSession",
+            url: "http://" + window.location.host + "/Home/FinishSession",
             dataType: 'json',
             method: 'POST',
             data: JSON.stringify($scope.user),
@@ -168,7 +168,7 @@ app.controller('GameSession', function ($scope, $http, $compile) {
 
     $scope.loadMoreQuestions = function () {
         $http({
-            url: "https://" + window.location.host + "/Home/GetGameData",
+            url: "http://" + window.location.host + "/Home/GetGameData",
             dataType: 'json',
             method: 'POST',
             data: JSON.stringify($scope.gameData),

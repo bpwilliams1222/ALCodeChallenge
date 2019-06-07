@@ -63,3 +63,7 @@ hr{
 hr{
     border-color:black;
 }
+
+#questionsTable>tbody {
+    cursor:pointer;
+}

@@ -15,7 +15,8 @@ namespace AccuLynxCodeTest
 {
     public class Startup
     {
-        public const string DBConnectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ALCodeChallenge;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        public static StorageModel DataStorageService;
+        public static string DBConnectionString = ""; //@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ALCodeChallengeFinalTest;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
         public Startup(IConfiguration configuration)
         {
@@ -36,6 +37,8 @@ namespace AccuLynxCodeTest
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            DBConnectionString = this.Configuration.GetConnectionString("appDbConnection");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +64,7 @@ namespace AccuLynxCodeTest
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+            DataStorageService = new StorageModel();
         }
     }
 }

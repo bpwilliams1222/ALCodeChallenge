@@ -18,15 +18,29 @@ namespace AccuLynxCodeTest.Controllers
 {
     public class HomeController : Controller
     {
-        private StorageModel DataStorageService = new StorageModel();
-
+        public bool CheckDataService()
+        {
+            if(Startup.DataStorageService == null)
+            {
+                return false;
+            }
+            return true;
+        }
         public IActionResult Quiz()
         {
+            if (!CheckDataService())
+            {
+                Startup.DataStorageService = new StorageModel();
+            }
             return View();
         }
 
         public IActionResult Index()
         {
+            if (!CheckDataService())
+            {
+                Startup.DataStorageService = new StorageModel();
+            }
             return View();
         }
         
@@ -49,11 +63,11 @@ namespace AccuLynxCodeTest.Controllers
                         //check to ensure the username doesn't exist in the db, if yes, then update the record rather then add
                         if (userDb.Users.SingleOrDefault(c => c.username == user.username) == null)
                         {
-                            DataStorageService.AddUser(user);
+                            Startup.DataStorageService.AddUser(user);
                         }
                         else
                         {
-                            DataStorageService.UpdateUser(user);
+                            Startup.DataStorageService.UpdateUser(user);
                         }
                     }
                     //return true, this is used as a flag to ensure data was saved to perform necessary UI actions based on the results
@@ -147,6 +161,10 @@ namespace AccuLynxCodeTest.Controllers
 
         public IActionResult Scores()
         {
+            if (!CheckDataService())
+            {
+                Startup.DataStorageService = new StorageModel();
+            }
             //get users from db and return to view
             var users = new List<UserModel>();
             try
