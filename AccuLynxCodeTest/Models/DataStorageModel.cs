@@ -44,7 +44,7 @@ namespace AccuLynxCodeTest.Models
             using (DataUpdateService = new BackgroundWorker())
             {
                 DataUpdateService.DoWork += FetchData;
-                DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, 5, 0).TotalMilliseconds);
+                DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, 1, 0).TotalMilliseconds);
                 DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
                 DataUpdateServiceTimer.Start();
             }           
@@ -57,11 +57,11 @@ namespace AccuLynxCodeTest.Models
             {
                 DataUpdateService.RunWorkerAsync();
                 //If the runFlag has not reached an 8 hour mark, then increment runFlag
-                if (runFlag != 60)
+                if (runFlag != 30)
                 {
                     runFlag++;
                     //Every 2 runs throttle back the api calling incrementally over time
-                    if (runFlag % 10 == 0)
+                    if (runFlag % 2 == 0)
                     {
                         DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(0, runFlag, 0).TotalMilliseconds);
                         DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
@@ -100,7 +100,7 @@ namespace AccuLynxCodeTest.Models
                                     DataUpdateServiceTimer = new System.Timers.Timer(new TimeSpan(1, 0, 0).TotalMilliseconds);
                                     DataUpdateServiceTimer.Elapsed += CheckDataUpdateProcess;
                                     DataUpdateServiceTimer.Start();
-                                    runFlag = 60;
+                                    runFlag = 30;
                                 }
                                 //No need to take action if there are not any questions
                                 if (Questions.Count > 0)
