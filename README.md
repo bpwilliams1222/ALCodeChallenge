@@ -14,4 +14,4 @@ update-database -Context QuestionsDb
 update-database -Context AnswerDb
 update-database -Context UsersDb
 
-That is all the setup that should be needed to execute this web app localling using VS.
+That is all the setup that should be needed to execute this web app locally using VS. If you are running this application on a new database please be aware that the application pulls data from Stack Overflows API at an automated rate. It is highly recommended that you let the application run for atleast 2 minutes prior to interacting with the application on a new database.
