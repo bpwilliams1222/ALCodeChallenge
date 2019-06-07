@@ -16,7 +16,7 @@ namespace AccuLynxCodeTest
     public class Startup
     {
         public static StorageModel DataStorageService;
-        public static string DBConnectionString = ""; //@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=ALCodeChallengeFinalTest;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        public static string DBConnectionString = ""; 
 
         public Startup(IConfiguration configuration)
         {
